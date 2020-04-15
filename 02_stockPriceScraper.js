@@ -1,13 +1,13 @@
 const puppeteer = require('puppeteer')
 
-const getStockPriceSM = async (stock) => {
+const getStockPrice = async (url) => {
 
-  stock = stock.toLowerCase().trim().replace(' ', '-')
-  const smallCapUrl = `https://www.avanza.se/aktier/om-aktien.html/5304/${stock}`
+  // stock = stock.toLowerCase().trim().replace(' ', '-')
+  // const smallCapUrl = `https://www.avanza.se/aktier/om-aktien.html/5304/${stock}`
 
   const browser = await puppeteer.launch({ headless: false })
   const page = await browser.newPage()
-  await page.goto(smallCapUrl)
+  await page.goto(url)
 
   const [priceEl] = await page.$x('//*[@id="surface"]/div[3]/div/div/div/div/ul/li[5]/span[2]')
   const priceStr = await priceEl.getProperty('textContent')
@@ -28,4 +28,4 @@ const getStockPriceSM = async (stock) => {
   browser.close()
 }
 
-getStockPriceSM('active biotech')
+getStockPrice('https://www.avanza.se/aktier/om-aktien.html/663401/bonava-a')
