@@ -1,15 +1,18 @@
 const puppeteer = require('puppeteer')
 
 const getStockPrice = async (url) => {
-
-  // stock = stock.toLowerCase().trim().replace(' ', '-')
-  // const smallCapUrl = `https://www.avanza.se/aktier/om-aktien.html/5304/${stock}`
-
   const browser = await puppeteer.launch({ headless: false })
   const page = await browser.newPage()
   await page.goto(url)
 
-  const [priceEl] = await page.$x('//*[@id="surface"]/div[3]/div/div/div/div/ul/li[5]/span[2]')
+  const [nameEl] = await page.$x(
+    '//*[@id="surface"]/div[5]/div[1]/div[3]/div/div[2]/div/div[1]/dl/dd[1]/span')
+  const nameStr = await nameEl.getProperty('textContent')
+  const nameJSON = await nameStr.jsonValue()
+  const nameArr = JSON.stringify(nameJSON).split('')
+
+  const [priceEl] = await page.$x(
+    '//*[@id="surface"]/div[3]/div/div/div/div/ul/li[6]/span[2]/span')
   const priceStr = await priceEl.getProperty('textContent')
   const priceJSON = await priceStr.jsonValue()
   const priceArr = JSON.stringify(priceJSON).split('')
@@ -22,10 +25,15 @@ const getStockPrice = async (url) => {
     }
   })
 
+  const name = nameArr.join('').replace(/[^a-zA-Z0-9 ]/g, "")
   const price = parseFloat(carveOutPrice.join('').replace(/,/g, '.'))
-  console.log(price)
+
+  console.log({
+    [name]: price
+  })
 
   browser.close()
 }
 
-getStockPrice('https://www.avanza.se/aktier/om-aktien.html/663401/bonava-a')
+getStockPrice('https://www.avanza.se/aktier/om-aktien.html/5237/electrolux-a')
+
